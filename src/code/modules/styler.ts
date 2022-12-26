@@ -1,6 +1,8 @@
 import { defaultSettings } from './default-settings.js';
 import { CMD, counter } from './globals';
 import { addAffixTo, isArrayEmpty, ucFirst } from './utils';
+import {figmaRGBToWebRGB, webRGBToFigmaRGB} from "./convert-color";
+import {createToneColor, rgbToArray, rgbToHex} from "./web-conver-colors";
 
 interface StylerOptions {
   name?: string;
@@ -52,13 +54,42 @@ export class Styler {
       console.log(`Apply: ${this.layerStyleID} not found || No style found for ${layer.name}`);
       return;
     }
-
     layer[this.layerStyleID] = style.id;
     counter.applied++;
   };
 
   createStyle = (layer, addPrevToDescription) => {
+
+
     let newStyle = figma[this.createStyleCommand]();
+
+    if(layer.fills.length > 1) {
+      const [mainFill, toneFill] = layer.fills;
+
+      const toneColor = figmaRGBToWebRGB(toneFill.color)
+      const mainColor = figmaRGBToWebRGB(mainFill.color)
+
+      const blendColor = createToneColor(mainColor, toneColor, toneFill.opacity)
+
+      const rgbArrayBlendColor = rgbToArray(blendColor);
+      const figmaFillColor = webRGBToFigmaRGB(rgbArrayBlendColor);
+
+      layer.fills = [{
+        blendMode: "NORMAL",
+        color: figmaFillColor,
+        opacity: 1,
+        type: "SOLID",
+        visible: true
+      }]
+    } else {
+      const mainFill = layer.fills[0]
+
+      const mainColor = figmaRGBToWebRGB(mainFill)
+      rgba
+
+    }
+
+    console.log(layer.fills)
 
     this.renameStyle(layer, newStyle);
     this.updateStyle(layer, newStyle, addPrevToDescription);
@@ -115,6 +146,7 @@ export class Styler {
   };
 
   updateStyle = (layer, styleNameMatch, addPrevToDescription, styleIdMatch = null) => {
+
     if (addPrevToDescription) {
       this.changeStyleDescription(styleNameMatch, styleIdMatch);
     }
@@ -151,6 +183,7 @@ export class Styler {
       updateUsingLocalStyles = defaultSettings.updateUsingLocalStyles,
       addPrevToDescription = defaultSettings.addPrevToDescription,
     } = options;
+
 
     if (this.isPropEmpty(layer) || this.isPropMixed(layer)) {
       console.log(`Generate: We have some mixed or empty props.`);

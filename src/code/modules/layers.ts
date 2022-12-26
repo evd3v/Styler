@@ -46,6 +46,8 @@ export const changeColor = (layer, prop, rgba = [0, 0, 0, 1]) => {
   cloned[0].color = { r, g, b };
   cloned[0].opacity = a;
 
+  console.log(layer[prop], cloned);
+
   return (layer[prop] = cloned);
 };
 
@@ -80,6 +82,7 @@ export const createTextLayer = async (
 ) => {
   const { color = colors.transparent, xPos = 0, yPos = xPos } = options;
 
+  console.log('createTextLayer')
   const newLayer = figma.createText();
   await figma.loadFontAsync(newLayer.fontName as FontName);
 

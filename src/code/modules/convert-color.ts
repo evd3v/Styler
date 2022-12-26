@@ -17,6 +17,7 @@ function figmaRGBToWebRGB(color): any {
   });
 
   if (color['a'] !== undefined) rgb[3] = Math.round(color['a'] * 100) / 100;
+
   return rgb;
 }
 
@@ -37,6 +38,7 @@ function webRGBToFigmaRGB(color): any {
   });
 
   if (color[3] !== undefined) rgb['a'] = color[3];
+
   return rgb;
 }
 
